@@ -91,34 +91,11 @@ void AWeapon::Fire()
 			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::White, false, .5f, 0.f, 3.0f);
 		}
 
-		if(MuzzleEffect)
-		{
-			UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
-		}
-
-
-
-		if(TracerEffect)
-		{
-			FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-
-			UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
-			if(TracerComp)
-			{
-				TracerComp->SetVectorParameter("BeamEnd", TracerEndPoint);
-			}
-
-		}
-
-
-
-
-
-
+		PlayFireEffects(TracerEndPoint);
 
 		FTimerHandle UnusedHandle;
 		GetWorldTimerManager().SetTimer(
-			UnusedHandle, this, &AWeapon::Reload, 2, false);
+			UnusedHandle, this, &AWeapon::Reload, .5, false);
 
 
 
@@ -127,16 +104,34 @@ void AWeapon::Fire()
 	}
 }
 
+void AWeapon::PlayFireEffects(FVector TraceEnd)
+{
+	if (MuzzleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
+	}
+
+
+
+	if (TracerEffect)
+	{
+		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
+
+		UParticleSystemComponent* TracerComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TracerEffect, MuzzleLocation);
+		if (TracerComp)
+		{
+			TracerComp->SetVectorParameter("BeamEnd", TraceEnd);
+		}
+
+	}
+}
+
 void AWeapon::Reload()
 {
 	bIsReloading = false;
 	UE_LOG(LogTemp, Warning, TEXT("Reload done"));
-}
 
-// Called every frame
-void AWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
+
 

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
+class AWeapon;
+
 UCLASS()
 class PROTOTYPINGPILOT_API AMainCharacter : public ACharacter
 {
@@ -33,6 +35,20 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	AWeapon* CurrentWeapon;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AWeapon> StarterWeaponClass;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	FName WeaponAttachSocketName;
+
+	void Fire();
+
+	void StartFire();
+
+	void EndFire();
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);

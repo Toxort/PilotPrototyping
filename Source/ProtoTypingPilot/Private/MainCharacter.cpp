@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
+#include "Weapon.h"
 #include "Components/CapsuleComponent.h"
 //#include "TestTopDownShooter.h"
 //#include "Bullet.h"
@@ -60,6 +61,8 @@ AMainCharacter::AMainCharacter()
 
 	bRightClickPressed = false;
 
+	WeaponAttachSocketName = "RightHandSocket";
+
 }
 
 // Called when the game starts or when spawned
@@ -73,6 +76,21 @@ void AMainCharacter::BeginPlay()
 		MyController->bEnableClickEvents = true;
 		MyController->bEnableMouseOverEvents = true;
 	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// Spawn Default Weapon
+	CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+	}
+}
+
+void AMainCharacter::Fire()
+{
+	CurrentWeapon->Fire();
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -156,5 +174,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::Turn);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMainCharacter::Dash);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMainCharacter::Fire);
 }
 
