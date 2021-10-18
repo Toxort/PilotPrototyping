@@ -148,13 +148,19 @@ void AMainCharacter::Turn(float Value)
 	FHitResult Hit;
 	MyController->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
 	FVector CurrentLocation = GetActorLocation();
-	FVector hitLocation = Hit.Location;
+	mouseHitLocation = Hit.Location;
 
-	FVector ReturnValue = hitLocation - CurrentLocation;
+	FVector ReturnValue = mouseHitLocation - CurrentLocation;
 	ReturnValue.Rotation();
 	FRotator hitTotalDirection(0.f, ReturnValue.Rotation().Yaw, 0.f);
 
 	SetActorRotation(hitTotalDirection);
+}
+
+void AMainCharacter::CaluculateDistanceBetweenMouseAndPlayer()
+{
+	distanceMouseToPlayer = (mouseHitLocation - GetActorLocation()).Size();
+	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distanceMouseToPlayer);
 }
 
 
@@ -163,6 +169,7 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CaluculateDistanceBetweenMouseAndPlayer();
 }
 
 // Called to bind functionality to input

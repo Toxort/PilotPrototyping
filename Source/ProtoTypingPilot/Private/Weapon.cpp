@@ -8,6 +8,7 @@
 #include "particles/ParticleSystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "particles/ParticleSystemComponent.h"
+#include "Components/AudioComponent.h"
 
 static int32 DebugWeaponDrawing = 0;
 FAutoConsoleVariableRef CVARDeugWeaponDrawing(
@@ -28,6 +29,7 @@ AWeapon::AWeapon()
 	MuzzleSocketName = "MuzzleSocket";
 
 	magazineSize = 7;
+	ShootSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootSound"));
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +45,7 @@ void AWeapon::Fire()
 	AActor* MyOwner = GetOwner();
 	if (MyOwner && bIsReloading == false)
 	{
+		playSound();
 		//FVector EyeLocation;
 		//FRotator EyeRotation;
 		//MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
@@ -136,6 +139,12 @@ void AWeapon::PlayFireEffects(FVector TraceEnd)
 	}
 	
 
+}
+
+
+void AWeapon::playSound()
+{
+	bPlaySound = true;
 }
 
 void AWeapon::Reload()

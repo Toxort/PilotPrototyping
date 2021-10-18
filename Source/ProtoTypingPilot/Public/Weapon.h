@@ -9,6 +9,7 @@
 class USkeletalMeshComponent;
 class UDamageType;
 class UParticleSystem;
+class UAudioComponent;
 
 UCLASS()
 class PROTOTYPINGPILOT_API AWeapon : public AActor
@@ -54,9 +55,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<UCameraShakeBase> FireCamShake;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Sounds")
+	UAudioComponent* ShootSound;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Sounds")
+		bool bPlaySound;
+
+	void playSound();
+
 	void Reload();
 
 	bool bIsReloading{ false };
+
+
 
 
 public:	

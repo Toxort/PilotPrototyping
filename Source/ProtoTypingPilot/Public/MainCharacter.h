@@ -32,6 +32,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class APlayerController* MyController;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwing")
+	float distanceMouseToPlayer;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -65,7 +68,13 @@ protected:
 	//void TestButton();
 	//void TestAxis(float Value);
 
+
+	void CaluculateDistanceBetweenMouseAndPlayer();
+
 private:
+
+	FVector mouseHitLocation;
+
 	bool bRightClickPressed;
 
 	float SpringArmYaw;
