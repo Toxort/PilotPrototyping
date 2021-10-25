@@ -7,6 +7,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/InputComponent.h"
 #include "Weapon.h"
+#include "SideCharacter.h"
 #include "Components/CapsuleComponent.h"
 //#include "TestTopDownShooter.h"
 //#include "Bullet.h"
@@ -143,7 +144,7 @@ void AMainCharacter::ResetDash()
 	DashOnce = true;
 }
 
-void AMainCharacter::Turn(float Value)
+void AMainCharacter::TurnToMouse(float Value)
 {
 	FHitResult Hit;
 	MyController->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
@@ -154,13 +155,59 @@ void AMainCharacter::Turn(float Value)
 	ReturnValue.Rotation();
 	FRotator hitTotalDirection(0.f, ReturnValue.Rotation().Yaw, 0.f);
 
+	float rotationRate = this->GetActorRotation().Yaw;
+	//UE_LOG(LogTemp, Warning, TEXT("TurnRateX: %f"), rotationRate);
+
+
 	SetActorRotation(hitTotalDirection);
 }
+
+void AMainCharacter::Turn2Test(float Value)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Value: %f"), Value);
+}
+
+void AMainCharacter::SideCharacterThrow()
+{
+	if(!bSideCharacterOnCooldown)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Instigator = this;
+		GetWorld()->SpawnActor<ASideCharacter>(BP_SideCharacter,
+			GetActorLocation() + FVector(-100.f, 200.f, 300.f),
+			FRotator(0.f, 0.f, 0.f),
+			SpawnParams);
+		bSideCharacterOnCooldown = true;
+
+		FTimerHandle UnusedHandle;
+		GetWorldTimerManager().SetTimer(
+			UnusedHandle, this, &AMainCharacter::ResetSideCharacterCooldown, 2, false);
+	}
+
+}
+
+void AMainCharacter::SetIsNotAimThrowing()
+{
+	brightMouseButtonPressed = false;
+}
+
+void AMainCharacter::SetIsAimThrowing()
+{
+	brightMouseButtonPressed = true;
+}
+
+
+
 
 void AMainCharacter::CaluculateDistanceBetweenMouseAndPlayer()
 {
 	distanceMouseToPlayer = (mouseHitLocation - GetActorLocation()).Size();
-	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distanceMouseToPlayer);
+	//UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distanceMouseToPlayer);
+}
+
+void AMainCharacter::ResetSideCharacterCooldown()
+{
+	bSideCharacterOnCooldown = false;
 }
 
 
@@ -168,7 +215,7 @@ void AMainCharacter::CaluculateDistanceBetweenMouseAndPlayer()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	TurnToMouse(0);
 	CaluculateDistanceBetweenMouseAndPlayer();
 }
 
@@ -179,9 +226,14 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::Turn);
+	//PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::TurnToMouse);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMainCharacter::Dash);
+	PlayerInputComponent->BindAxis("Turn2", this, &AMainCharacter::Turn2Test);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMainCharacter::Fire);
+	PlayerInputComponent->BindAction("AimThrowing", IE_Pressed, this, &AMainCharacter::SetIsAimThrowing);
+	PlayerInputComponent->BindAction("AimThrowing", IE_Released, this, &AMainCharacter::SetIsNotAimThrowing);
+	PlayerInputComponent->BindAction("SideCharacter", IE_Pressed, this, &AMainCharacter::SideCharacterThrow);
+
 }
 

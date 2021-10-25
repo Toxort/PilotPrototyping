@@ -35,6 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwing")
 	float distanceMouseToPlayer;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -43,6 +44,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AWeapon> StarterWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SideCharacter")
+	TSubclassOf<class ASideCharacter> BP_SideCharacter;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
@@ -59,7 +63,12 @@ protected:
 	void DashExecute();
 	bool DashOnce{ true };
 	void ResetDash();
-	void Turn(float Value);
+	void TurnToMouse(float Value);
+	void Turn2Test(float Value);
+	void SideCharacterThrow();
+	void SetIsAimThrowing();
+	void SetIsNotAimThrowing();
+
 
 	//void TurnCamera(float Value);
 	//void Shoot();
@@ -79,12 +88,22 @@ private:
 
 	float SpringArmYaw;
 
+	void ResetSideCharacterCooldown();
+
+	bool bSideCharacterOnCooldown{ false };
+
 public:
+
+	UPROPERTY(EditAnywhere, Category = "SideCharacter")
+	float ThrowCooldownTime{ 2 };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float MovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float TurnRate;
+
+	bool brightMouseButtonPressed{ false };
+
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
