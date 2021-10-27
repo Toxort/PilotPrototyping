@@ -8,9 +8,11 @@
 #include "Components/InputComponent.h"
 #include "Weapon.h"
 #include "SideCharacter.h"
+#include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
 //#include "TestTopDownShooter.h"
 //#include "Bullet.h"
+#include "Components/SplineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -51,6 +53,7 @@ AMainCharacter::AMainCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->bUsePawnControlRotation = false;
 
+
 	MovementSpeed = 20;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
@@ -63,6 +66,10 @@ AMainCharacter::AMainCharacter()
 	bRightClickPressed = false;
 
 	WeaponAttachSocketName = "RightHandSocket";
+
+	SideCharacterSpawnPoint = { -100.f, 200.f, 300.f };
+
+	SideCharacterThrowPoint = SideCharacterSpawnPoint + FVector{ 0,0,160 };
 
 }
 
@@ -91,7 +98,10 @@ void AMainCharacter::BeginPlay()
 
 void AMainCharacter::Fire()
 {
-	CurrentWeapon->Fire();
+	if(!bRightMouseButtonPressed)
+	{
+		CurrentWeapon->Fire();
+	}
 }
 
 void AMainCharacter::MoveForward(float Value)
@@ -174,7 +184,7 @@ void AMainCharacter::SideCharacterThrow()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Instigator = this;
 		GetWorld()->SpawnActor<ASideCharacter>(BP_SideCharacter,
-			GetActorLocation() + FVector(-100.f, 200.f, 300.f),
+			GetActorLocation() + SideCharacterSpawnPoint,
 			FRotator(0.f, 0.f, 0.f),
 			SpawnParams);
 		bSideCharacterOnCooldown = true;
@@ -183,17 +193,30 @@ void AMainCharacter::SideCharacterThrow()
 		GetWorldTimerManager().SetTimer(
 			UnusedHandle, this, &AMainCharacter::ResetSideCharacterCooldown, 2, false);
 	}
-
 }
+
 
 void AMainCharacter::SetIsNotAimThrowing()
 {
-	brightMouseButtonPressed = false;
+	bRightMouseButtonPressed = false;
+	UE_LOG(LogTemp, Warning, TEXT("False"));
+}
+
+void AMainCharacter::SetLeftMouseTrue()
+{
+	Fire();
+	bLeftClickedPressed = true;
+}
+
+void AMainCharacter::SetLeftMouseFalse()
+{
+	bLeftClickedPressed = false;
 }
 
 void AMainCharacter::SetIsAimThrowing()
 {
-	brightMouseButtonPressed = true;
+	bRightMouseButtonPressed = true;
+	UE_LOG(LogTemp, Warning, TEXT("True"));
 }
 
 
@@ -210,6 +233,58 @@ void AMainCharacter::ResetSideCharacterCooldown()
 	bSideCharacterOnCooldown = false;
 }
 
+FRotator AMainCharacter::GetMouseDirection(FVector PlayerLocation)
+{
+	FHitResult Hit;
+	MyController->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	FVector CurrentLocation = {PlayerLocation.X,PlayerLocation.Y, 0};
+	mouseHitLocation = Hit.Location;
+
+	FVector ReturnValue = mouseHitLocation - CurrentLocation;
+	ReturnValue.Rotation();
+	FRotator hitTotalDirection(0.f, ReturnValue.Rotation().Yaw, 0.f);
+
+	return hitTotalDirection;
+}
+
+FVector AMainCharacter::GetMousePosition()
+{
+	FHitResult Hit;
+	MyController->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	mouseHitLocation = Hit.Location;
+	return mouseHitLocation;
+}
+
+//void AMainCharacter::CreatePredictionSpline()
+//{
+//	UWorld* const World = GetWorld();
+//	if(World && IsValid(BP_EndPoint))
+//	{
+//	FActorSpawnParameters SpawnParams;
+//	SpawnParams.Instigator = this;
+//	
+//		World->SpawnActor<ASideCharacter>(BP_EndPoint,
+//			FVector(100,100,300),
+//			FRotator(0.f, 0.f, 0.f),
+//			SpawnParams);
+//		
+//	}
+//	
+//}
+
+//void AMainCharacter::DestroyPredictionSpline()
+//{
+//	if(IsValid(BP_EndPoint))
+//	{
+//		PredictionSpline->DestroyComponent();
+//		BP_EndPoint;
+//	}
+//}
+
+//void AMainCharacter::DrawPredictionSpline()
+//{
+//}
+
 
 // Called every frame
 void AMainCharacter::Tick(float DeltaTime)
@@ -224,13 +299,16 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// Movement
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 	//PlayerInputComponent->BindAxis("Turn", this, &AMainCharacter::TurnToMouse);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMainCharacter::Dash);
 	PlayerInputComponent->BindAxis("Turn2", this, &AMainCharacter::Turn2Test);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMainCharacter::Fire);
+	// Fire and Throwing
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMainCharacter::SetLeftMouseTrue);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AMainCharacter::SetLeftMouseFalse);
 	PlayerInputComponent->BindAction("AimThrowing", IE_Pressed, this, &AMainCharacter::SetIsAimThrowing);
 	PlayerInputComponent->BindAction("AimThrowing", IE_Released, this, &AMainCharacter::SetIsNotAimThrowing);
 	PlayerInputComponent->BindAction("SideCharacter", IE_Pressed, this, &AMainCharacter::SideCharacterThrow);

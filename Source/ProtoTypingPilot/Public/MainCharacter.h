@@ -32,8 +32,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class APlayerController* MyController;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwing")
-	float distanceMouseToPlayer;
+
 
 
 protected:
@@ -51,6 +50,16 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
 
+	// Throwing
+	//UPROPERTY(EditDefaultsOnly, Category = "Throwing")
+	//	class USplineComponent* PredictionSpline;
+
+	//UPROPERTY(EditAnywhere, Category = "Throwing")
+	//	float ThrowForce{ 1500 };
+
+	//UPROPERTY(EditDefaultsOnly, Category = "Throwing")
+	//	TSubclassOf<class AActor> BP_EndPoint;
+
 	void Fire();
 
 	void StartFire();
@@ -60,14 +69,14 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Dash();
-	void DashExecute();
 	bool DashOnce{ true };
 	void ResetDash();
 	void TurnToMouse(float Value);
 	void Turn2Test(float Value);
-	void SideCharacterThrow();
 	void SetIsAimThrowing();
 	void SetIsNotAimThrowing();
+	void SetLeftMouseTrue();
+	void SetLeftMouseFalse();
 
 
 	//void TurnCamera(float Value);
@@ -88,23 +97,48 @@ private:
 
 	float SpringArmYaw;
 
+	//SideCharacter Throw
 	void ResetSideCharacterCooldown();
-
-	bool bSideCharacterOnCooldown{ false };
-
+	void CreatePredictionSpline();
+	void DestroyPredictionSpline();
+	void DrawPredictionSpline();
 public:
 
-	UPROPERTY(EditAnywhere, Category = "SideCharacter")
-	float ThrowCooldownTime{ 2 };
+	UFUNCTION(BlueprintCallable, Category = "Throwing")
+	FRotator GetMouseDirection(FVector PlayerLocation);
+
+	UFUNCTION(BlueprintCallable, Category = "Throwing")
+		FVector GetMousePosition();
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float MovementSpeed;
+
 	UPROPERTY(EditAnywhere, Category = "Movement")
 		float TurnRate;
 
-	bool brightMouseButtonPressed{ false };
+	UFUNCTION(BlueprintCallable, Category = "Throwing")
+	void SideCharacterThrow();
 
+	UPROPERTY(EditAnywhere, Category = "Throwing")
+	float ThrowCooldownTime{ 2 };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Throwing")
+		float distanceMouseToPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
+		FVector SideCharacterSpawnPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
+		FVector SideCharacterThrowPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
+	bool bRightMouseButtonPressed{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
+	bool bLeftClickedPressed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
+	bool bSideCharacterOnCooldown{ false };
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

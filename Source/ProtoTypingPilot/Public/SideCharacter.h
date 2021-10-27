@@ -28,20 +28,14 @@ protected:
 	virtual void BeginPlay() override;
 
 	void SelfDestroy();
+
+	UFUNCTION(BlueprintCallable, Category = "Throwing")
 	void TurnToMouse();
 
-	void CreatePredictionSpline();
-	void DestroyPredictionSpline();
-	void DrawPredictionSpline();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Throwing")
-	USplineComponent* PredictionSpline;
 
-	UPROPERTY(EditAnywhere, Category = "Throwing")
-	float ThrowForce{ 1500 };
 
-	UPROPERTY(EditDefaultsOnly, Category = "Throwing")
-	TSubclassOf<class AActor> BP_EndPoint;
+
 
 private:
 	bool bCheckMousePositonTurnOnce{ true };

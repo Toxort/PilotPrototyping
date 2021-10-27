@@ -48,22 +48,20 @@ void ASideCharacter::TurnToMouse()
 	}
 }
 
-void ASideCharacter::CreatePredictionSpline()
-{
-	AMainCharacter* MainCharacterRef = Cast<AMainCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if(MainCharacterRef)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ValidCast"));
-	}
-}
+//void ASideCharacter::CreatePredictionSpline()
+//{
+//	AMainCharacter* MainCharacterRef = Cast<AMainCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+//	if(!MainCharacterRef)
+//	{
+//		return;
+//	}
+//	MainCharacterRef->bRightMouseButtonPressed;
+//	if (MainCharacterRef->bRightMouseButtonPressed)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("ValidCast"));
+//	}
+//}
 
-void ASideCharacter::DestroyPredictionSpline()
-{
-}
-
-void ASideCharacter::DrawPredictionSpline()
-{
-}
 
 
 // Called every frame
