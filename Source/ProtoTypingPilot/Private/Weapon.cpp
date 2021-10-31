@@ -28,8 +28,14 @@ AWeapon::AWeapon()
 
 	MuzzleSocketName = "MuzzleSocket";
 
-	magazineSize = 7;
 	ShootSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootSound"));
+
+	// Weapon
+	CurrentAmmoAmount = 0;
+	CurrentAmmoType = "-";
+	MaxAmmoCapacity = 20;
+
+	Inventory = { "-", "-", "-"};
 }
 
 // Called when the game starts or when spawned
@@ -37,7 +43,7 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bulletsLeft = magazineSize;
+	CurrentAmmoAmount = MaxAmmoCapacity;
 }
 
 void AWeapon::Fire()

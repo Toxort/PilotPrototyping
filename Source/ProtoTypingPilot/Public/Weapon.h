@@ -36,9 +36,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 		TSubclassOf<UDamageType> DamageType;
 
-	float magazineSize;
 
-	float bulletsLeft;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FName MuzzleSocketName;
@@ -67,9 +65,17 @@ protected:
 
 	bool bIsReloading{ false };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerStats")
+		FString CurrentAmmoType;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerStats")
+		int32 MaxAmmoCapacity;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerStats")
+		int32 CurrentAmmoAmount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerStats")
+		TArray<FString> Inventory;
 public:	
 
 };

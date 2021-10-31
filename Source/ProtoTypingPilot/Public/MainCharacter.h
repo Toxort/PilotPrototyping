@@ -39,7 +39,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	AWeapon* CurrentWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	AWeapon* CurrentShotWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<AWeapon> StarterWeaponClass;
@@ -78,6 +79,9 @@ protected:
 	void SetLeftMouseTrue();
 	void SetLeftMouseFalse();
 
+	void Interact();
+	void InteractReleased();
+
 
 	//void TurnCamera(float Value);
 	//void Shoot();
@@ -95,6 +99,7 @@ private:
 
 	bool bRightClickPressed;
 
+
 	float SpringArmYaw;
 
 	//SideCharacter Throw
@@ -102,6 +107,8 @@ private:
 	void CreatePredictionSpline();
 	void DestroyPredictionSpline();
 	void DrawPredictionSpline();
+
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Throwing")
@@ -139,10 +146,23 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Throwing")
 	bool bSideCharacterOnCooldown{ false };
+
+
+	// Pickup
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup")
+	bool bShowPickupPrompt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup")
+	bool bEPressed;
+
+	void PromptPickup();
+	void RemovePromptPickup();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 };

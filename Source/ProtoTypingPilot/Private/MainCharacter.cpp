@@ -71,6 +71,9 @@ AMainCharacter::AMainCharacter()
 
 	SideCharacterThrowPoint = SideCharacterSpawnPoint + FVector{ 0,0,160 };
 
+
+
+
 }
 
 // Called when the game starts or when spawned
@@ -88,11 +91,11 @@ void AMainCharacter::BeginPlay()
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	// Spawn Default Weapon
-	CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
-	if(CurrentWeapon)
+	CurrentShotWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
+	if(CurrentShotWeapon)
 	{
-		CurrentWeapon->SetOwner(this);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+		CurrentShotWeapon->SetOwner(this);
+		CurrentShotWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 	}
 }
 
@@ -100,7 +103,7 @@ void AMainCharacter::Fire()
 {
 	if(!bRightMouseButtonPressed)
 	{
-		CurrentWeapon->Fire();
+		CurrentShotWeapon->Fire();
 	}
 }
 
@@ -114,7 +117,7 @@ void AMainCharacter::MoveForward(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(Direction, Value);
 		//AddActorLocalOffset(Direction * Value * MovementSpeed * GetWorld()->GetDeltaSeconds());
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, "Forward-Backward");
+		//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, "Forward-Backward");
 	}
 }
 
@@ -128,7 +131,7 @@ void AMainCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(Direction, Value);
 		//AddActorLocalOffset(Direction * Value * MovementSpeed * GetWorld()->GetDeltaSeconds());
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, "Right-Left");
+		//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, "Right-Left");
 
 		//SetActorRotation(FRotator(0, 0, 0));
 	}
@@ -199,7 +202,7 @@ void AMainCharacter::SideCharacterThrow()
 void AMainCharacter::SetIsNotAimThrowing()
 {
 	bRightMouseButtonPressed = false;
-	UE_LOG(LogTemp, Warning, TEXT("False"));
+	
 }
 
 void AMainCharacter::SetLeftMouseTrue()
@@ -211,6 +214,17 @@ void AMainCharacter::SetLeftMouseTrue()
 void AMainCharacter::SetLeftMouseFalse()
 {
 	bLeftClickedPressed = false;
+}
+
+void AMainCharacter::Interact()
+{
+	UE_LOG(LogTemp, Warning, TEXT("E"));
+	bEPressed = true;
+}
+
+void AMainCharacter::InteractReleased()
+{
+	bEPressed = false;
 }
 
 void AMainCharacter::SetIsAimThrowing()
@@ -231,6 +245,16 @@ void AMainCharacter::CaluculateDistanceBetweenMouseAndPlayer()
 void AMainCharacter::ResetSideCharacterCooldown()
 {
 	bSideCharacterOnCooldown = false;
+}
+
+void AMainCharacter::PromptPickup()
+{
+	bShowPickupPrompt = true;
+}
+
+void AMainCharacter::RemovePromptPickup()
+{
+	bShowPickupPrompt = false;
 }
 
 FRotator AMainCharacter::GetMouseDirection(FVector PlayerLocation)
@@ -312,6 +336,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("AimThrowing", IE_Pressed, this, &AMainCharacter::SetIsAimThrowing);
 	PlayerInputComponent->BindAction("AimThrowing", IE_Released, this, &AMainCharacter::SetIsNotAimThrowing);
 	PlayerInputComponent->BindAction("SideCharacter", IE_Pressed, this, &AMainCharacter::SideCharacterThrow);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AMainCharacter::Interact);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AMainCharacter::InteractReleased);
 
 }
 
